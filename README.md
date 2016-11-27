@@ -1,5 +1,5 @@
 # ModSense
-### The Lego power strip. We built it smart, modular and connected.
+### The LEGO power strip. We built it smart, modular and connected.
 
 ![Logo](https://github.com/JCacho/ModSense/blob/master/LOGO_ModSense.jpg)
 
