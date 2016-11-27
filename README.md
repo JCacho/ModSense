@@ -1,7 +1,6 @@
 # ModSense
 ### The Lego power strip. We built it smart, modular and connected.
 
-[![Open on vimeo](http://i.imgur.com/hzTBXZz.png)](https://vimeo.com/186166763)
 [![Logo](https://github.com/JCacho/ModSense/blob/master/LOGO_ModSense.jpg)]
 
 ## Inspiration
