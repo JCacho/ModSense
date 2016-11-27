@@ -35,3 +35,5 @@ Do you at least know how much power you are wasting with your electronics when y
  - Actual testing using Mains power
  - Build more modules and add more functionalites
  - Re-make the design more compact
+
+[Visit Us Here!](https://devpost.com/software/modsense-dzi6vx)
