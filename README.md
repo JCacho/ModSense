@@ -1,7 +1,7 @@
 # ModSense
 ### The Lego power strip. We built it smart, modular and connected.
 
-[![Logo](https://github.com/JCacho/ModSense/blob/master/LOGO_ModSense.jpg)]
+![Logo](https://github.com/JCacho/ModSense/blob/master/LOGO_ModSense.jpg)
 
 ## Inspiration
 Have you never tried to plug your computer charger to the power strip but you didn't find any vacant space? Of course you have, because you don't have a ModSense power strip.
