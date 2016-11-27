@@ -25,14 +25,13 @@ Do you at least know how much power you are wasting with your electronics when y
 ## Accomplishments that we're proud of
  - Finishing the prototype in time
  - Building something from scratch
- - 
+ 
 ## What we learned
  - How to use Autodesk Fusion 360 and Cura
  - How to integrate the ESP, the server and the mobile phone
- - 
 
 ## What's next for ModSense
  - Sleep
  - Actual testing using Mains power
- - Build more modules, with more functionalites
- - Re-make the design, more compact
+ - Build more modules and add more functionalites
+ - Re-make the design more compact
