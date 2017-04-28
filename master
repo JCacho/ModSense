@@ -1,0 +1,129 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <Wire.h>
+const char* ssid = "Junction";
+const char* password = NULL;
+char c;
+int i;
+typedef struct{
+  String stripname;  // Office, Room,  
+  String sensortype; // temp, hum,
+  String sensorvalue;
+  String socketID;
+} Powerstrip;
+
+void setup() {
+  pinMode(D0, OUTPUT);
+  Wire.begin(D2,D1);
+  Wire.setClock(100000);
+  Serial.begin(115200);
+  WiFi.begin(ssid,password);
+  while(WiFi.status() != WL_CONNECTED){
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println("Connected");
+}
+
+typedef union{
+  byte raw[4];
+  float value;
+} RawFloat;
+
+int ownOn = 0;
+int otherOn = 0;
+
+void postSensorDatas(String type, String socketId, String value){
+    Powerstrip pstrp;
+    pstrp.stripname = "office";
+    pstrp.sensortype = type;
+    pstrp.sensorvalue = value;
+    pstrp.socketID = socketId;
+
+    HTTPClient http;
+    http.begin("http://modsense.herokuapp.com/postdata");
+    String headerName= "Content-Type";
+    String headerValue= "application/x-www-form-urlencoded";
+    http.addHeader(headerName,headerValue);
+
+    int httpCode = http.POST("stripname=" + pstrp.stripname + "&sensortype=" + pstrp.sensortype + "&sensorvalue=" + pstrp.sensorvalue + "&socketid=" + pstrp.socketID);
+    Serial.println("stripname=" + pstrp.stripname + "&sensortype=" + pstrp.sensortype + "&sensorvalue=" + pstrp.sensorvalue + "&socketid=" + pstrp.socketID);
+    
+    http.end();
+}
+
+
+void setRelays(){
+    HTTPClient http;
+    http.begin("http://modsense.herokuapp.com/status?stripid=office");
+
+    int httpCode = http.GET();
+    String resp = http.getString();
+    int selectedEnd = 0;
+    int onOff = 0;
+    for(int i = 0; i<resp.length();i++){
+      if(i%2 == 0){
+          selectedEnd = resp.charAt(i) - '0';
+      }else{
+          onOff = resp.charAt(i) - '0';
+          if(selectedEnd == 0){
+            digitalWrite(D0,onOff);
+          }
+          if(selectedEnd == 8){
+            otherOn = onOff;
+                Wire.beginTransmission(8);
+                if(otherOn){
+                  Wire.write(0xBB); 
+                }else{
+                  Wire.write(0xAA); 
+                }
+                Wire.endTransmission();
+          }
+      }
+      Serial.println("i, ownOn, otherOn, onOff, selectedEnd ");
+      Serial.println(i);
+      Serial.println(ownOn);
+      Serial.println(otherOn);
+      Serial.println(onOff);
+      Serial.println(selectedEnd);
+    }
+    
+    Serial.println(resp);
+    http.end();
+
+
+}
+
+int timi = 0;
+int onn = 0;
+void loop() {
+  if(WiFi.status()==WL_CONNECTED){
+   Serial.println("Waiting...");   
+   Wire.requestFrom(8,sizeof(float)+sizeof(int16_t));
+   int i = 0;
+   byte byteBuffer[sizeof(float)+sizeof(int16_t)];
+   if(Wire.available() >= sizeof(float)+sizeof(int16_t)){
+    while(i<sizeof(float)+sizeof(int16_t)){
+      byteBuffer[i] = Wire.read();
+      i++;
+    }
+    float current = 0;
+    memcpy(&current,byteBuffer,sizeof(float));
+    int temperature = byteBuffer[sizeof(float)] | (byteBuffer[sizeof(float)+1]<<8);
+    Serial.print("Temperature: ");
+    Serial.println(temperature);
+    Serial.print("Current: ");
+    Serial.println(current);
+    Serial.print("sizeof(float): ");
+    Serial.println(sizeof(float));
+    Serial.print("sizeof(int16_t): ");
+    Serial.println(sizeof(int16_t));
+    postSensorDatas("temp","8",String((float)(temperature/100)));
+    postSensorDatas("current","8",String(current));
+   }
+  }else{
+    Serial.println("Error in Wifi connection");
+  } 
+  delay(1000);
+  setRelays();
+}
